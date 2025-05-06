@@ -1,12 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartNegotiate</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #2e6f95;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-  <h1>SmartNegotiate is Live</h1>
-  <p>This is a placeholder for the AI negotiation assistant UI.</p>
+  <div class="container">
+    <h1>SmartNegotiate 🤖</h1>
+    <label>Что вы хотите от поставщика:</label>
+    <textarea id="client" rows="3" placeholder="Например: Хочу скидку на 500 упаковок"></textarea>
+    
+    <label>Коммерческое предложение от поставщика:</label>
+    <textarea id="offer" rows="5" placeholder="Вставьте текст письма/оффера"></textarea>
+
+    <button onclick="generate()">Сгенерировать ответ</button>
+
+    <div class="result" id="output">Ответ появится здесь...</div>
+  </div>
+
+  <script>
+    async function generate() {
+      const client = document.getElementById("client").value;
+      const offer = document.getElementById("offer").value;
+
+      const prompt = `Ты — профессиональный менеджер по закупкам. Клиент хочет: "${client}". Оффер от поставщика: "${offer}". Сгенерируй грамотный деловой ответ с уточняющими вопросами.`;
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer YOUR_API_KEY_HERE"
+        },
+        body: JSON.stringify({
+          model: "gpt-4-turbo",
+          messages: [{role: "system", content: prompt}],
+          temperature: 0.7
+        })
+      });
+
+      const data = await res.json();
+      const message = data.choices?.[0]?.message?.content;
+      document.getElementById("output").textContent = message || "Ошибка генерации.";
+    }
+  </script>
 </body>
 </html>
