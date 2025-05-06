@@ -68,24 +68,16 @@
       const client = document.getElementById("client").value;
       const offer = document.getElementById("offer").value;
 
-      const prompt = `Ты — профессиональный менеджер по закупкам. Клиент хочет: "${client}". Оффер от поставщика: "${offer}". Сгенерируй грамотный деловой ответ с уточняющими вопросами.`;
-
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_API_KEY_HERE"
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: "gpt-4-turbo",
-          messages: [{role: "system", content: prompt}],
-          temperature: 0.7
-        })
+        body: JSON.stringify({ client, offer })
       });
 
       const data = await res.json();
-      const message = data.choices?.[0]?.message?.content;
-      document.getElementById("output").textContent = message || "Ошибка генерации.";
+      document.getElementById("output").textContent = data.result || "Ошибка генерации.";
     }
   </script>
 </body>
